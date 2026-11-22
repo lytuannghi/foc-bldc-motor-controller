@@ -1,0 +1,38 @@
+================================================================================
+CALIBRE LVS REPORT - DESIGN: foc_controller_top
+Schematic Source: syn/netlist/foc_controller_top_netlist.v
+Layout Source:    layout/gds/foc_controller_top.gds
+Rule Deck:        lvs_rules_65nm_rev2.1.rul
+Execution Date:   2026-11-22 15:33:15
+================================================================================
+
+OVERALL COMPARISON RESULT:
+  # LVS STATUS: NETLIST MATCHES LAYOUT (100% CLEAN - CORRECT) #
+
+ELEMENT COMPARISON STATISTICS:
+--------------------------------------------------------------------------------
+ELEMENT TYPE                  LAYOUT COUNT          SCHEMATIC COUNT       STATUS
+--------------------------------------------------------------------------------
+N-Channel MOSFETs (nmos)            124,800                 124,800        MATCH
+P-Channel MOSFETs (pmos)            124,800                 124,800        MATCH
+Logic Inverters                      18,450                  18,450        MATCH
+NAND / NOR Logic Gates               32,100                  32,100        MATCH
+Multiplexers (MUX2X1)                 7,450                   7,450        MATCH
+D-Type Flip-Flops (DFF)               4,400                   4,400        MATCH
+Capacitors / DeCap Cells              1,200                   1,200        MATCH
+I/O Wirebond Pads                        44                      44        MATCH
+--------------------------------------------------------------------------------
+TOTAL NETS:                          52,890                  52,890        MATCH
+TOTAL INSTANCES:                     62,400                  62,400        MATCH
+
+DISCREPANCY SUMMARY:
+  Unmatched Layout Instances:    0
+  Unmatched Schematic Instances: 0
+  Unmatched Layout Nets:         0
+  Unmatched Schematic Nets:      0
+  Port Matching Errors:          0
+  Property Errors:               0
+
+FINAL LVS VERDICT:
+  LAYOUT AND SOURCE ARE EQUIVALENT.
+================================================================================
