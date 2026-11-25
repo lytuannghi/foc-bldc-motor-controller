@@ -62,16 +62,15 @@ Target Demands | Dual PI Regulators |-->|  Inverse Park   |
 
 | Parameter | Specification |
 |:---|:---|
-| Process Technology | 65nm CMOS Standard Cell (1.08V / 1.2V IO) |
-| Core Clock Frequency | 100.00 MHz (Timing closure verified up to 210 MHz) |
+| Process Technology | SkyWater 130nm (`sky130_fd_sc_hd` / 5-metal GDSII deck) |
+| Core Clock Frequency (SDC) | 100.00 MHz (`syn/` SDC target; external OpenSTA required for slack) |
 | Arithmetic Representation | Signed Fixed-Point Q15 (1 sign bit, 15 fractional bits) |
 | CORDIC Pipeline Depth | 16 clock cycles latency (Throughput: 1 sample/clock) |
 | Current Control Bandwidth | Up to 100 kHz closed-loop update rate |
 | PWM Switching Frequency | Configurable 10 kHz to 100 kHz center-aligned |
 | Programmable Dead-Time | 10 ns to 2.55 us (0 to 255 clock cycles) |
-| Silicon Core Area | 89,856 um^2 (0.0898 mm^2) |
-| Total Die Dimensions | 1300 um x 1300 um (1.69 mm^2) |
-| Physical Layout Standard | Binary GDSII Stream Format (Stream Version 7) |
+| GDSII Die Footprint | 360.00 um x 360.00 um (0 geometric DRC violations) |
+| Physical Verification | `layout/scripts/verify_gds_drc.py` (0 geometric DRC violations) |
 
 ---
 
@@ -103,15 +102,40 @@ Waveforms are output to `sim/waves/tb_foc_controller.vcd` for cycle-accurate deb
 
 ---
 
-## Static Timing Analysis & Synthesis
+## RTL Synthesis Readiness & SDC Audit
 
-Static Timing Analysis (STA) was executed under worst-case slow process corner conditions (SS, 0.81V, 125C):
+Static Verilog-2005 structural parsing and SDC constraint inspection were executed via `syn/analyze_rtl.py` (external Yosys/OpenSTA required for foundry gate counts and post-synthesis slack):
 
-- Clock Constraint: 10.000 ns (100.00 MHz)
-- Worst Data Arrival Time: 2.032 ns
-- Maximum Operating Frequency: 210.0 MHz
+```text
+================================================================================
+RTL SYNTHESIS READINESS & CONSTRAINT REPORT: foc-bldc-motor-controller
+Method : Static Verilog/SV Structural Parser + SDC Constraint Audit
+Note   : Foundry Gate-Level Netlist & STA require PDK Liberty (.lib) + Synopsys/OpenROAD
+================================================================================
+RTL Source Files Inspected : 8
+Code Lines (Non-Comment)   : 611
+Sequential Blocks          : 7
+Combinational Blocks       : 2
+Declared reg/logic Signals : 63
 
-Detailed timing and area reports are provided in `syn/reports/timing_report.txt` and `syn/reports/area_report.txt`.
+MODULE BREAKDOWN:
+  rtl\cordic\cordic_rotator.v                   | modules=cordic_rotator               | loc=  93 | seq= 1 | comb= 1
+  rtl\estimator\smo_observer.v                  | modules=smo_observer                 | loc=  60 | seq= 1 | comb= 0
+  rtl\foc_controller_top.v                      | modules=foc_controller_top           | loc= 138 | seq= 0 | comb= 0
+  rtl\pi\pi_controller.v                        | modules=pi_controller                | loc=  50 | seq= 1 | comb= 0
+  rtl\svpwm\svpwm_generator.v                   | modules=svpwm_generator              | loc= 148 | seq= 1 | comb= 1
+  rtl\transform\clarke_transform.v              | modules=clarke_transform             | loc=  32 | seq= 1 | comb= 0
+  rtl\transform\inv_park_transform.v            | modules=inv_park_transform           | loc=  45 | seq= 1 | comb= 0
+  rtl\transform\park_transform.v                | modules=park_transform               | loc=  45 | seq= 1 | comb= 0
+
+SDC CLOCK CONSTRAINTS:
+  foc_timing.sdc: port=clk | period=10.00 ns | target=100.00 MHz
+
+ARITHMETIC DIVISION/MODULO CHECK: CLEAN (0 combinational / or % operators)
+================================================================================
+```
+
+Detailed constraint and structural audit logs are stored in `syn/reports/timing_report.txt` and `syn/reports/area_report.txt`.
 
 ---
 
@@ -120,8 +144,8 @@ Detailed timing and area reports are provided in `syn/reports/timing_report.txt`
 The ASIC layout was synthesized and streamed to industry-standard GDSII format:
 - Layout File: `layout/gds/foc_controller_top.gds`
 - Generator Script: `layout/scripts/build_layout_foc.py`
-- DRC Report: `layout/reports/drc_report.txt` (0 errors, 100% clean)
-- LVS Report: `layout/reports/lvs_report.txt` (100% netlist to layout match)
+- DRC Report: `layout/reports/drc_report.txt` (0 geometric DRC violations via `verify_gds_drc.py`)
+- LVS Report: `layout/reports/lvs_report.txt` (GDSII geometry + top-level port audit; external Magic/Netgen required for SPICE LVS)
 
 ---
 
