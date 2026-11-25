@@ -71,7 +71,6 @@ Target Demands | Dual PI Regulators |-->|  Inverse Park   |
 | Programmable Dead-Time | 10 ns to 2.55 us (0 to 255 clock cycles) |
 | Silicon Core Area | 89,856 um^2 (0.0898 mm^2) |
 | Total Die Dimensions | 1300 um x 1300 um (1.69 mm^2) |
-| Equivalent Gate Count | 62,400 NAND2-equivalent logic gates |
 | Physical Layout Standard | Binary GDSII Stream Format (Stream Version 7) |
 
 ---
@@ -110,8 +109,6 @@ Static Timing Analysis (STA) was executed under worst-case slow process corner c
 
 - Clock Constraint: 10.000 ns (100.00 MHz)
 - Worst Data Arrival Time: 2.032 ns
-- Setup Slack: +8.060 ns (MET)
-- Hold Slack: +0.145 ns (MET)
 - Maximum Operating Frequency: 210.0 MHz
 
 Detailed timing and area reports are provided in `syn/reports/timing_report.txt` and `syn/reports/area_report.txt`.

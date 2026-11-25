@@ -87,6 +87,7 @@ module tb_foc_controller;
 
     // Direct sub-module test hooks for isolated mathematical precision verification
     reg clk_sub;
+    wire signed [15:0] park_q;
     reg rst_sub_n;
     reg in_valid_sub;
     reg signed [15:0] sub_ia, sub_ib;
@@ -282,7 +283,7 @@ module tb_foc_controller;
         @(posedge clk);
         @(posedge clk);
 
-        if (park_id >= 16'sd23000 && park_id <= 16'sd23300) begin
+        if (park_id >= 16'sd23000 && park_id <= 16'sd23300 && park_q >= -16'sd5 && park_q <= 16'sd5) begin
             $display("[PASS] Test 4: Forward Park transform flux alignment verified (Id=%d, Iq=%d).", park_id, park_q);
             tests_passed = tests_passed + 1;
         end else begin

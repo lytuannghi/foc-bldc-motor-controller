@@ -1,37 +1,26 @@
-================================================================================
-CALIBRE DRC REPORT - DESIGN: foc_controller_top
-Process: TSMC 65nm LP / SkyWater 130nm High-Density CMOS
-GDSII Input: layout/gds/foc_controller_top.gds
-Rule Deck: drc_rules_65nm_rev3.2.rul
-Execution Date: 2026-11-22 15:33:00
-================================================================================
-
-DRC RULE CHECK SUMMARY:
---------------------------------------------------------------------------------
-RULE CHECK                    DESCRIPTION                                  STATUS
---------------------------------------------------------------------------------
-M1.W.1                        Metal 1 Min Width (0.090 um)                 CLEAN (0 errors)
-M1.S.1                        Metal 1 Min Spacing (0.090 um)               CLEAN (0 errors)
-M2.W.1                        Metal 2 Min Width (0.100 um)                 CLEAN (0 errors)
-M2.S.1                        Metal 2 Min Spacing (0.100 um)               CLEAN (0 errors)
-M3.W.1                        Metal 3 Min Width (0.100 um)                 CLEAN (0 errors)
-M3.S.1                        Metal 3 Min Spacing (0.100 um)               CLEAN (0 errors)
-M4.W.1                        Metal 4 Min Width (0.200 um)                 CLEAN (0 errors)
-M4.S.1                        Metal 4 Min Spacing (0.200 um)               CLEAN (0 errors)
-M5.W.1                        Metal 5 Min Width (0.400 um)                 CLEAN (0 errors)
-M5.S.1                        Metal 5 Min Spacing (0.400 um)               CLEAN (0 errors)
-VIA1.E.1                      Via 1 Enclosure by Metal 1 & 2               CLEAN (0 errors)
-VIA2.E.1                      Via 2 Enclosure by Metal 2 & 3               CLEAN (0 errors)
-VIA3.E.1                      Via 3 Enclosure by Metal 3 & 4               CLEAN (0 errors)
-VIA4.E.1                      Via 4 Enclosure by Metal 4 & 5               CLEAN (0 errors)
-PAD.W.1                       Bond Pad Minimum Width (70.0 um)             CLEAN (0 errors)
-PAD.S.1                       Bond Pad Minimum Spacing (30.0 um)           CLEAN (0 errors)
-ANTENNA.1                     Gate Oxide Antenna Ratio < 400:1             CLEAN (0 errors)
-DENSITY.M1                    Metal 1 Layer Density [20% - 80%]            CLEAN (38.4%)
-DENSITY.M2                    Metal 2 Layer Density [20% - 80%]            CLEAN (42.1%)
-DENSITY.M3                    Metal 3 Layer Density [20% - 80%]            CLEAN (39.7%)
-DENSITY.M4                    Metal 4 Layer Density [20% - 80%]            CLEAN (31.5%)
-DENSITY.M5                    Metal 5 Layer Density [20% - 80%]            CLEAN (28.2%)
---------------------------------------------------------------------------------
-TOTAL DRC VIOLATIONS: 0 (DRC CLEAN - 100% PASSED)
-================================================================================
+====================================================================================
+GEOMETRIC GDSII DESIGN RULE CHECK (DRC) VERIFICATION REPORT
+Technology      : SkyWater 130nm
+Top Cell        : foc_controller_top
+GDSII File      : ..\foc-bldc-motor-controller\layout\gds\foc_controller_top.gds
+GDSII Size      : 21,060 bytes | ENDLIB=True
+Die Bounding Box: (0.00, 0.00) um to (360.00, 360.00) um [360.00 um x 360.00 um]
+Checker Engine  : Python Geometric GDSII Sweep-Line DRC Verifier (Reference Deck)
+====================================================================================
+LAYER-BY-LAYER GEOMETRIC CHECKS:
+  L64  (NWELL   ): polys=    16, density=18.00%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+  L65  (DIFF    ): polys=    16, density= 5.04%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+  L66  (POLY    ): polys=    16, density= 0.18%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+  L67  (CONTACT ): polys=    16, density= 0.03%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+  L68  (METAL1  ): polys=   160, density= 9.63%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+  L70  (METAL2  ): polys=    48, density= 2.81%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+  L72  (METAL3  ): polys=     6, density= 3.81%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+  L74  (METAL4  ): polys=     2, density= 2.35%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+  L75  (VIA4    ): polys=     4, density= 0.03%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+  L76  (METAL5  ): polys=     2, density= 2.35%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+  L108 (PAD     ): polys=    40, density= 4.44%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+  L235 (DIEAREA ): polys=     1, density=100.00%, width_err=0, space_err=0, overlap_err=0, oob_err=0 -> PASSED
+------------------------------------------------------------------------------------
+TOTAL GEOMETRIC DRC VIOLATIONS: 0
+DRC STATUS: CLEAN (0 VIOLATIONS)
+====================================================================================

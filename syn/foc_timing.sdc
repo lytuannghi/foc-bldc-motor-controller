@@ -1,7 +1,7 @@
 # ==============================================================================
 # Synopsys Design Constraints (SDC)
 # Target: Sensorless FOC Motor Controller ASIC Core
-# Process Technology: TSMC 65nm LP / SkyWater 130nm High-Density Standard Cells
+# Process Technology: SkyWater 130nm HD Standard Cell Library (1.80V, 25C)
 # Operating Conditions: Fast-Fast (0.99V, 0C) / Slow-Slow (0.81V, 125C)
 # Target Frequency: 100 MHz (Clock Period = 10.0 ns)
 # ==============================================================================

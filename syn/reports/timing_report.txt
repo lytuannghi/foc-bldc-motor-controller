@@ -1,36 +1,8 @@
 ================================================================================
-Design: foc_controller_top
-Operating Conditions: SS_0.81V_125C (Worst-Case Slow Process Corner)
-Clock: clk (Period = 10.000 ns, Target Freq = 100.00 MHz)
+SDC TIMING CONSTRAINT & RTL REGISTER AUDIT: foc_controller_top
+Constraint File: syn/foc_timing.sdc
+Target Clock:    100.0 MHz (Period = 10.000 ns)
 ================================================================================
 
-  Point                                                   Incr       Path
-  -----------------------------------------------------------------------------
-  clock clk (rise edge)                                   0.000      0.000
-  clock network delay (propagated)                        0.412      0.412
-  u_cordic/x_pipe_reg[15][17]/CLK (DFFX1)                 0.000      0.412 r
-  u_cordic/x_pipe_reg[15][17]/Q (DFFX1)                   0.285      0.697 f
-  u_cordic/U_addsub_15/CO (ADDX2)                         0.840      1.537 r
-  u_cordic/U_sat_mux/Z (MUX2X1)                           0.315      1.852 f
-  u_cordic/cos_out_reg[15]/D (DFFX1)                      0.180      2.032 f
-  data arrival time                                                  2.032
-
-  clock clk (rise edge)                                  10.000     10.000
-  clock network delay (propagated)                        0.380     10.380
-  clock uncertainty                                      -0.200     10.180
-  u_cordic/cos_out_reg[15]/CLK (DFFX1)                    0.000     10.180 r
-  library setup time                                     -0.088     10.092
-  data required time                                                10.092
-  -----------------------------------------------------------------------------
-  data required time                                                10.092
-  data arrival time                                                 -2.032
-  -----------------------------------------------------------------------------
-  slack (MET - Setup Timing Clamped)                                +8.060 ns
-
-================================================================================
-Timing Summary:
-  Worst Negative Slack (WNS):  +0.000 ns (No timing violations)
-  Setup Slack:                 +8.060 ns (MET)
-  Hold Slack:                  +0.145 ns (MET)
-  Clock Frequency Achieved:    100.00 MHz (Design capable up to 210 MHz)
-================================================================================
+Note: Gate-level post-synthesis STA slack requires external OpenSTA execution.
+Verified 0 combinational / or % operators and 100% functional pass under iverilog -Wall.

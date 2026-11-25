@@ -1,0 +1,26 @@
+================================================================================
+RTL SYNTHESIS READINESS & CONSTRAINT REPORT: foc-bldc-motor-controller
+Method : Static Verilog/SV Structural Parser + SDC Constraint Audit
+Note   : Foundry Gate-Level Netlist & STA require PDK Liberty (.lib) + Synopsys/OpenROAD
+================================================================================
+RTL Source Files Inspected : 8
+Code Lines (Non-Comment)   : 611
+Sequential Blocks          : 7
+Combinational Blocks       : 2
+Declared reg/logic Signals : 63
+
+MODULE BREAKDOWN:
+  rtl\cordic\cordic_rotator.v                   | modules=cordic_rotator               | loc=  93 | seq= 1 | comb= 1
+  rtl\estimator\smo_observer.v                  | modules=smo_observer                 | loc=  60 | seq= 1 | comb= 0
+  rtl\foc_controller_top.v                      | modules=foc_controller_top           | loc= 138 | seq= 0 | comb= 0
+  rtl\pi\pi_controller.v                        | modules=pi_controller                | loc=  50 | seq= 1 | comb= 0
+  rtl\svpwm\svpwm_generator.v                   | modules=svpwm_generator              | loc= 148 | seq= 1 | comb= 1
+  rtl\transform\clarke_transform.v              | modules=clarke_transform             | loc=  32 | seq= 1 | comb= 0
+  rtl\transform\inv_park_transform.v            | modules=inv_park_transform           | loc=  45 | seq= 1 | comb= 0
+  rtl\transform\park_transform.v                | modules=park_transform               | loc=  45 | seq= 1 | comb= 0
+
+SDC CLOCK CONSTRAINTS:
+  foc_timing.sdc: port=clk | period=10.00 ns | target=100.00 MHz
+
+ARITHMETIC DIVISION/MODULO CHECK: CLEAN (0 combinational / or % operators)
+================================================================================

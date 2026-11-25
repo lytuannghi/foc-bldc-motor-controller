@@ -1,119 +1,113 @@
 #!/usr/bin/env python3
 """
-Physical Design Layout & GDSII Generator for Sensorless FOC Motor Controller ASIC
-Generates full-chip layout stream format (GDSII stream version 7) including:
-- Die Boundary (1300 um x 1300 um)
-- Power Ring (VDD / VSS on Metal 4 & Metal 5)
-- Standard Cell Placement Rows
-- Sub-block modules (Clarke, CORDIC 16-stage pipeline, Park, PI Controllers, SVPWM, SMO)
-- I/O Wirebond Pads
+SkyWater 130nm Multi-Layer Physical GDSII Layout Generator for foc_controller_top.
+Produces a DRC-clean macro floorplan, dual M4/M5 power ring, standard-cell rails,
+I/O pad ring, and verifies all geometric rules with verify_gds_drc.py.
 """
-
-import struct
 import os
 import sys
 
-def gds_record(record_type, data_type, data=b""):
-    length = len(data) + 4
-    header = struct.pack(">HH", length, (record_type << 8) | data_type)
-    return header + data
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+if SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, SCRIPT_DIR)
 
-def write_gds(filename):
-    out = bytearray()
+from verify_gds_drc import GDSWriter, verify_gds
 
-    # HEADER (record 0x00, type 0x02: 2-byte int)
-    out.extend(gds_record(0x00, 0x02, struct.pack(">H", 600)))
 
-    # BGNLIB (record 0x01, type 0x02: 12 2-byte ints)
-    out.extend(gds_record(0x01, 0x02, struct.pack(">12H", 2026, 11, 22, 12, 0, 0, 2026, 11, 22, 12, 0, 0)))
+def build_layout():
+    layout_dir = os.path.dirname(SCRIPT_DIR)
+    gds_path = os.path.join(layout_dir, "gds", "foc_controller_top.gds")
+    report_path = os.path.join(layout_dir, "reports", "drc_report.txt")
+    os.makedirs(os.path.dirname(gds_path), exist_ok=True)
+    os.makedirs(os.path.dirname(report_path), exist_ok=True)
 
-    # LIBNAME (record 0x02, type 0x06: ASCII string)
-    lib_name = b"FOC_MOTOR_CONTROLLER_LIB\x00"
-    if len(lib_name) % 2 != 0: lib_name += b"\x00"
-    out.extend(gds_record(0x02, 0x06, lib_name))
+    die_w = 360000
+    die_h = 360000
+    macro_cols = 4
+    macro_rows = 4
+    pad_count = 10
 
-    # UNITS (record 0x03, type 0x05: two 8-byte doubles - user units in m, db units in m)
-    # 0.001 um database unit (1 nm = 1e-9 m), user unit = 1 um (1e-6 m)
-    out.extend(gds_record(0x03, 0x05, struct.pack(">dd", 0.001, 1e-9)))
+    L_DIE_AREA = 235
+    L_NWELL = 64
+    L_DIFF = 65
+    L_POLY = 66
+    L_CONTACT = 67
+    L_MET1 = 68
+    L_VIA1 = 69
+    L_MET2 = 70
+    L_VIA2 = 71
+    L_MET3 = 72
+    L_VIA3 = 73
+    L_MET4 = 74
+    L_VIA4 = 75
+    L_MET5 = 76
+    L_PAD = 108
 
-    # BGNSTR (record 0x05, type 0x02)
-    out.extend(gds_record(0x05, 0x02, struct.pack(">12H", 2026, 11, 22, 12, 0, 0, 2026, 11, 22, 12, 0, 0)))
+    gds = GDSWriter(gds_path, "FOC_MOTOR_LIB")
+    gds.start_structure("foc_controller_top")
+    gds.add_box(L_DIE_AREA, 0, 0, 0, die_w, die_h)
 
-    # STRNAME (record 0x06, type 0x06)
-    str_name = b"foc_controller_top\x00"
-    if len(str_name) % 2 != 0: str_name += b"\x00"
-    out.extend(gds_record(0x06, 0x06, str_name))
+    RING_M = 28000
+    RING_W = 5000
+    CORE_X1 = RING_M + RING_W + 10000
+    CORE_Y1 = RING_M + RING_W + 10000
+    CORE_X2 = die_w - RING_M - RING_W - 10000
+    CORE_Y2 = die_h - RING_M - RING_W - 10000
 
-    def add_box(layer, datatype, x1, y1, x2, y2):
-        b = bytearray()
-        b.extend(gds_record(0x08, 0x00)) # BOUNDARY
-        b.extend(gds_record(0x0D, 0x02, struct.pack(">H", layer)))
-        b.extend(gds_record(0x0E, 0x02, struct.pack(">H", datatype)))
-        # XY coordinates (5 points, closed loop)
-        coords = struct.pack(">10i", x1, y1, x2, y1, x2, y2, x1, y2, x1, y1)
-        b.extend(gds_record(0x10, 0x03, coords))
-        b.extend(gds_record(0x11, 0x00)) # ENDEL
-        return b
+    gds.add_box(L_MET5, 0, RING_M, RING_M, die_w - RING_M, RING_M + RING_W)
+    gds.add_box(L_MET5, 0, RING_M, die_h - RING_M - RING_W, die_w - RING_M, die_h - RING_M)
+    gds.add_box(L_MET4, 0, RING_M, RING_M, RING_M + RING_W, die_h - RING_M)
+    gds.add_box(L_MET4, 0, die_w - RING_M - RING_W, RING_M, die_w - RING_M, die_h - RING_M)
 
-    # 1. Die Boundary (Layer 100): 1300 um x 1300 um (1300000 nm x 1300000 nm)
-    out.extend(add_box(100, 0, 0, 0, 1300000, 1300000))
+    for vx in (RING_M + 1000, die_w - RING_M - RING_W + 1000):
+        for vy in (RING_M + 1000, die_h - RING_M - RING_W + 1000):
+            gds.add_box(L_VIA4, 0, vx, vy, vx + 3000, vy + 3000)
 
-    # 2. Core Area (Layer 108): 100 um margin -> 100,000 to 1,200,000
-    out.extend(add_box(108, 0, 100000, 100000, 1200000, 1200000))
+    PAD_W, PAD_H = 12000, 12000
+    span_x = (CORE_X2 - CORE_X1) // pad_count
+    span_y = (CORE_Y2 - CORE_Y1) // pad_count
+    for i in range(pad_count):
+        px = CORE_X1 + i * span_x + (span_x - PAD_W) // 2
+        gds.add_box(L_PAD, 0, px, 6000, px + PAD_W, 6000 + PAD_H)
+        gds.add_box(L_PAD, 0, px, die_h - 6000 - PAD_H, px + PAD_W, die_h - 6000)
+        py = CORE_Y1 + i * span_y + (span_y - PAD_H) // 2
+        gds.add_box(L_PAD, 0, 6000, py, 6000 + PAD_W, py + PAD_H)
+        gds.add_box(L_PAD, 0, die_w - 6000 - PAD_W, py, die_w - 6000, py + PAD_H)
 
-    # 3. Power Rings (Metal 4: Layer 31, Metal 5: Layer 32)
-    # VDD Outer Ring
-    out.extend(add_box(31, 0, 90000, 90000, 1210000, 105000))
-    out.extend(add_box(31, 0, 90000, 1195000, 1210000, 1210000))
-    out.extend(add_box(32, 0, 90000, 90000, 105000, 1210000))
-    out.extend(add_box(32, 0, 1195000, 90000, 1210000, 1210000))
+    mw = (CORE_X2 - CORE_X1 - (macro_cols - 1) * 14000) // macro_cols
+    mh = (CORE_Y2 - CORE_Y1 - (macro_rows - 1) * 14000) // macro_rows
+    for r in range(macro_rows):
+        for c in range(macro_cols):
+            mx1 = CORE_X1 + c * (mw + 14000)
+            my1 = CORE_Y1 + r * (mh + 14000)
+            mx2 = mx1 + mw
+            my2 = my1 + mh
+            gds.add_box(L_NWELL, 0, mx1 + 2000, my1 + 2000, mx2 - 2000, my1 + mh // 2)
+            gds.add_box(L_DIFF, 0, mx1 + 3500, my1 + 3500, mx2 - 3500, my1 + 11500)
+            gds.add_box(L_POLY, 0, mx1 + 5000, my1 + 2800, mx1 + 6500, my1 + 12500)
+            gds.add_box(L_CONTACT, 0, mx1 + 8500, my1 + 5500, mx1 + 10000, my1 + 7000)
+            for ry in range(my1 + 15000, my2 - 6000, 4000):
+                gds.add_box(L_MET1, 0, mx1 + 3000, ry, mx2 - 3000, ry + 1500)
+            for bx in range(mx1 + 12000, mx2 - 12000, 12000):
+                gds.add_box(L_MET2, 0, bx, my1 + 14000, bx + 2000, my2 - 6000)
 
-    # VSS Inner Ring
-    out.extend(add_box(31, 1, 110000, 110000, 1190000, 125000))
-    out.extend(add_box(31, 1, 110000, 1175000, 1190000, 1190000))
-    out.extend(add_box(32, 1, 110000, 110000, 125000, 1190000))
-    out.extend(add_box(32, 1, 1175000, 110000, 1190000, 1190000))
+    for c in range(1, macro_cols):
+        cx = CORE_X1 + c * (mw + 14000) - 9000
+        gds.add_box(L_MET3, 0, cx, CORE_Y1, cx + 3000, CORE_Y2)
+        gds.add_box(L_MET3, 0, cx + 6000, CORE_Y1, cx + 9000, CORE_Y2)
 
-    # 4. Functional Subsystem Floorplanning Blocks (Layer 40)
-    # CORDIC 16-Stage Rotation Engine (Center Core: 400 um x 400 um)
-    out.extend(add_box(40, 1, 450000, 450000, 850000, 850000))
-    # Clarke & Park Forward Transforms (West: 250 um x 300 um)
-    out.extend(add_box(40, 2, 150000, 500000, 400000, 800000))
-    # Dual PI Current Controllers (North: 350 um x 250 um)
-    out.extend(add_box(40, 3, 450000, 900000, 850000, 1150000))
-    # Inverse Park & SVPWM Generator (East: 300 um x 350 um)
-    out.extend(add_box(40, 4, 900000, 450000, 1180000, 800000))
-    # Sliding Mode Observer (South: 350 um x 250 um)
-    out.extend(add_box(40, 5, 450000, 150000, 850000, 400000))
+    gds.end_structure()
+    gds.close()
 
-    # 5. Standard Cell Placement Rows (Metal 1: Layer 11)
-    for y in range(150000, 1150000, 8000): # 8 um pitch standard cell rows
-        out.extend(add_box(11, 0, 140000, y, 1160000, y + 4000))
+    total_v = verify_gds(
+        gds_path=gds_path,
+        report_path=report_path,
+        top_name="foc_controller_top",
+        tech_name="SkyWater 130nm",
+    )
+    print(f"[OK] Generated {gds_path} ({os.path.getsize(gds_path)} bytes), DRC violations={total_v}")
+    return 0 if total_v == 0 else 1
 
-    # 6. I/O Wirebond Pads (Layer 70: 70 um x 70 um)
-    # North & South edges
-    for x in range(120000, 1180000, 100000):
-        out.extend(add_box(70, 0, x, 15000, x + 70000, 85000))
-        out.extend(add_box(70, 0, x, 1215000, x + 70000, 1285000))
-    # East & West edges
-    for y in range(120000, 1180000, 100000):
-        out.extend(add_box(70, 0, 15000, y, 85000, y + 70000))
-        out.extend(add_box(70, 0, 1215000, y, 1285000, y + 70000))
-
-    # ENDSTR (record 0x07, type 0x00)
-    out.extend(gds_record(0x07, 0x00))
-
-    # ENDLIB (record 0x04, type 0x00)
-    out.extend(gds_record(0x04, 0x00))
-
-    with open(filename, "wb") as f:
-        f.write(out)
-
-    print(f"[SUCCESS] Generated binary GDSII layout stream: {filename} ({len(out)} bytes)")
 
 if __name__ == "__main__":
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    gds_dir = os.path.abspath(os.path.join(script_dir, "..", "gds"))
-    os.makedirs(gds_dir, exist_ok=True)
-    target_gds = os.path.join(gds_dir, "foc_controller_top.gds")
-    write_gds(target_gds)
+    sys.exit(build_layout())

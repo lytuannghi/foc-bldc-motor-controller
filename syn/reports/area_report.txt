@@ -1,22 +1,32 @@
 ================================================================================
-Design: foc_controller_top
-Library: standard_cell_library_65nm
-Units: Area in um^2, Gate Count in NAND2 Equivalents (1 NAND2 = 1.44 um^2)
+RTL STRUCTURAL & SYNTHESIS READINESS SUMMARY: foc_controller_top
+Target Library Constraints: SkyWater 130nm HD Standard Cells (SDC)
 ================================================================================
 
-Hierarchy                               Combinational  Sequential   Total Area  Gate Count
-------------------------------------------------------------------------------------------
-foc_controller_top                            48,250      41,606       89,856      62,400
-  u_clarke (clarke_transform)                  2,410       1,350        3,760       2,611
-  u_cordic (cordic_rotator)                   16,200      18,450       34,650      24,062
-  u_park (park_transform)                      5,120       2,880        8,000       5,555
-  u_pi_d (pi_controller)                       3,400       2,650        6,050       4,201
-  u_pi_q (pi_controller)                       3,400       2,650        6,050       4,201
-  u_inv_park (inv_park_transform)              4,980       2,720        7,700       5,347
-  u_svpwm (svpwm_generator)                    6,840       5,306       12,146       8,435
-  u_smo (smo_observer)                         5,900       5,600       11,500       7,986
-------------------------------------------------------------------------------------------
-Total Chip Core Silicon Area: 89,856 um^2 (0.0898 mm^2)
-Equivalent Gate Count: 62,400 NAND2-equivalent logic gates
-Macro / Memory Instances: 0 (Pure Standard Cell Synthesizable ASIC RTL)
 ================================================================================
+RTL SYNTHESIS READINESS & CONSTRAINT REPORT: foc-bldc-motor-controller
+Method : Static Verilog/SV Structural Parser + SDC Constraint Audit
+Note   : Foundry Gate-Level Netlist & STA require PDK Liberty (.lib) + Synopsys/OpenROAD
+================================================================================
+RTL Source Files Inspected : 8
+Code Lines (Non-Comment)   : 611
+Sequential Blocks          : 7
+Combinational Blocks       : 2
+Declared reg/logic Signals : 63
+
+MODULE BREAKDOWN:
+  rtl\cordic\cordic_rotator.v                   | modules=cordic_rotator               | loc=  93 | seq= 1 | comb= 1
+  rtl\estimator\smo_observer.v                  | modules=smo_observer                 | loc=  60 | seq= 1 | comb= 0
+  rtl\foc_controller_top.v                      | modules=foc_controller_top           | loc= 138 | seq= 0 | comb= 0
+  rtl\pi\pi_controller.v                        | modules=pi_controller                | loc=  50 | seq= 1 | comb= 0
+  rtl\svpwm\svpwm_generator.v                   | modules=svpwm_generator              | loc= 148 | seq= 1 | comb= 1
+  rtl\transform\clarke_transform.v              | modules=clarke_transform             | loc=  32 | seq= 1 | comb= 0
+  rtl\transform\inv_park_transform.v            | modules=inv_park_transform           | loc=  45 | seq= 1 | comb= 0
+  rtl\transform\park_transform.v                | modules=park_transform               | loc=  45 | seq= 1 | comb= 0
+
+SDC CLOCK CONSTRAINTS:
+  foc_timing.sdc: port=clk | period=10.00 ns | target=100.00 MHz
+
+ARITHMETIC DIVISION/MODULO CHECK: CLEAN (0 combinational / or % operators)
+================================================================================
+
